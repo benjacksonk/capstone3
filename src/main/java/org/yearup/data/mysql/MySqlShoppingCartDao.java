@@ -74,57 +74,51 @@ public class MySqlShoppingCartDao extends  MySqlDaoBase implements ShoppingCartD
     }
 
     @Override
-    public ShoppingCart create(int userId, int productId, int quantity){
-    ShoppingCart shoppingCart = getByUserId(userId);
+    public ShoppingCart create(int userId, int productId, int quantity) {
 
-    if (shoppingCart.contains(productId)){
-       ShoppingCartItem item = shoppingCart.get(productId);
-        item.setQuantity(item.getQuantity() + 1);
+        ShoppingCart shoppingCart = getByUserId(userId);
 
+        if (shoppingCart.contains(productId)){
+            //update quantity by one
+            ShoppingCartItem item = shoppingCart.get(productId);
+            item.setQuantity(item.getQuantity() + 1);
+            update(userId, productId, item.getQuantity());
+        }
+        else {
 
+            String query = "Insert into shopping_cart(user_id, product_id, quantity) " +
+                    "VALUES(?,?,?)"
+                    + "ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)";
 
-        //update quantity by one
-    } else {
+            try (Connection connection = getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
+                preparedStatement.setInt(1,userId);
+                preparedStatement.setInt(2,productId);
+                preparedStatement.setInt(3,quantity);
 
-        String query = "Insert into shopping_cart(user_id, product_id, quantity) " +
-                "VALUES(?,?,?)"
-                + "ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)";
+                int rowsAffected = preparedStatement.executeUpdate();
 
-        try(Connection connection = getConnection()){
-            PreparedStatement preparedStatement = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
-            preparedStatement.setInt(1,userId);
-            preparedStatement.setInt(2,productId);
-            preparedStatement.setInt(3,quantity);
+                if (rowsAffected > 0) {
+                    ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        int cartItemId = generatedKeys.getInt(1);
+                        ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
 
-            int rowsAffected = preparedStatement.executeUpdate();
-
-            if(rowsAffected > 0){
-                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-                if (generatedKeys.next()){
-                    int cartItemId = generatedKeys.getInt(1);
-                    ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
-
-                    //updates shopping cart with the new stuff
-                    shoppingCartItem.setProductId(productId);
-                    shoppingCartItem.setQuantity(quantity);
-                    shoppingCart.get(productId);
-                    shoppingCart.add(shoppingCartItem);
+                        //updates shopping cart with the new stuff
+                        shoppingCartItem.setProductId(productId);
+                        shoppingCartItem.setQuantity(quantity);
+                        shoppingCart.get(productId);
+                        shoppingCart.add(shoppingCartItem);
+                    }
                 }
             }
-
-
-
-        }catch (SQLException e){
-            throw new RuntimeException(e);
+            catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-
-
-    }
 
         return shoppingCart;
-
-
-        }
+    }
 
 
     @Override
