@@ -18,12 +18,9 @@ class MySqlProductDaoTest extends BaseDaoTestClass
         dao = new MySqlProductDao(dataSource);
     }
 
-    //not being used anymore
-    /*
     @Test
-    public void getById_shouldReturn_theCorrectProduct()
-    {
-        // arrange
+    public void getById_shouldReturn_theCorrectProduct() {
+        //arrange
         int productId = 1;
         Product expected = new Product()
         {{
@@ -38,53 +35,121 @@ class MySqlProductDaoTest extends BaseDaoTestClass
             setImageUrl("smartphone.jpg");
         }};
 
-        // act
+        //act
         var actual = dao.getById(productId);
 
-        // assert
+        //assert
         assertEquals(expected.getPrice(), actual.getPrice(), "Because I tried to get product 1 from the database.");
     }
-    */
 
     @Test
-    void search_matches() {
-        List<Product> products = dao.search(2, new BigDecimal(75), new BigDecimal(150), "");
+    public void search_matches() {
+        //arrange
 
+        //act
+        var products = dao.search(2, new BigDecimal(75), new BigDecimal(150), "");
+
+        //assert
         assertEquals(false, products.isEmpty());
     }
 
     @Test
-    void search_noMatches() {
-        List<Product> products = dao.search(-2, new BigDecimal(-150), new BigDecimal(-75), "v0idyllic");
+    public void search_noMatches() {
+        //arrange
 
+        //act
+        var products = dao.search(-2, new BigDecimal(-150), new BigDecimal(-75), "v0idyllic");
+
+        //assert
         assertEquals(true, products.isEmpty());
     }
 
     @Test
-    void listByCategoryId_matches() {
-        List<Product> products = dao.listByCategoryId(1);
+    public void listByCategoryId_matches() {
+        //arrange
 
+        //act
+        var products = dao.listByCategoryId(1);
+
+        //assert
         assertEquals(false, products.isEmpty());
     }
 
     @Test
-    void listByCategoryId_noMatches() {
-        List<Product> products = dao.listByCategoryId(-2);
+    public void listByCategoryId_noMatches() {
+        //arrange
 
+        //act
+        var products = dao.listByCategoryId(-2);
+
+        //assert
         assertEquals(true, products.isEmpty());
     }
 
     @Test
-    void getById_match() {
-        Product product = dao.getById(1);
+    public void getById_match() {
+        //arrange
 
+        //act
+        var product = dao.getById(1);
+
+        //assert
         assertInstanceOf(Product.class, product);
     }
 
     @Test
-    void getById_noMatch() {
-        Product product = dao.getById(-2);
+    public void getById_noMatch() {
+        //arrange
 
+        //act
+        var product = dao.getById(-2);
+
+        //assert
         assertNull(product);
     }
+
+    @Test
+    public void create_addsProduct() {
+        //arrange
+        Product expectedProduct = new Product()
+        {{
+            setName("testBlahduct_plsIgn0r");
+            setPrice(new BigDecimal("98.21"));
+            setCategoryId(1);
+            setDescription("nondescript");
+            setColor("nope");
+            setStock(3);
+            setFeatured(false);
+            setImageUrl("smartphone.jpg");
+        }};
+
+        //act
+        var createdProduct = dao.create(expectedProduct);
+
+        //assert
+        assertEquals(expectedProduct.getName(), createdProduct.getName());
+    }
+
+    @Test
+    public void delete_removesProduct() {
+        //arrange
+
+        //act
+        dao.delete(1);
+
+        //assert
+        assertNull(dao.getById(1));
+    }
+
+    @Test
+    public void delete_removesOnlyTheSpecifiedProduct() {
+        //arrange
+
+        //act
+        dao.delete(1);
+
+        //assert
+        assertInstanceOf(Product.class, dao.getById(2));
+    }
+
 }
