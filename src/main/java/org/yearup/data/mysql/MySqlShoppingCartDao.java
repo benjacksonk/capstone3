@@ -80,6 +80,8 @@ public class MySqlShoppingCartDao extends  MySqlDaoBase implements ShoppingCartD
     if (shoppingCart.contains(productId)){
        ShoppingCartItem item = shoppingCart.get(productId);
         item.setQuantity(item.getQuantity() + 1);
+        update(userId, productId, item.getQuantity());
+
 
 
 
