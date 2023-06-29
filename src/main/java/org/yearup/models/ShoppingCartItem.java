@@ -11,6 +11,7 @@ public class ShoppingCartItem
     private BigDecimal discountPercent = BigDecimal.ZERO;
 
 
+
     public Product getProduct()
     {
         return product;
@@ -56,5 +57,10 @@ public class ShoppingCartItem
         BigDecimal discountAmount = subTotal.multiply(discountPercent);
 
         return subTotal.subtract(discountAmount);
+    }
+
+
+    public int setProductId(int productId) {
+        return productId;
     }
 }
