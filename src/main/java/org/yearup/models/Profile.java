@@ -1,5 +1,7 @@
 package org.yearup.models;
 
+import java.util.List;
+
 public class Profile
 {
     private int userId;
@@ -118,4 +120,9 @@ public class Profile
     {
         this.zip = zip;
     }
+
+    public List<Product> getWishList() {
+        return getWishList();
+    }
+
 }
