@@ -118,8 +118,6 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, categoryId);
             int rows = statement.executeUpdate();
-            int x = 5;
-            int y = 2;
             if (rows == 0) {
                 throw new SQLException("Did not work");
             }
