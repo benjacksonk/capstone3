@@ -67,7 +67,7 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
         try {
             connection = getConnection();
             String query = "INSERT INTO categories (name, description) VALUES(?, ?)";
-            preparedStatement = connection.prepareStatement(query);
+            preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setString(1, category.getName());
             preparedStatement.setString(2, category.getDescription());
             int rows = preparedStatement.executeUpdate();
@@ -118,6 +118,8 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, categoryId);
             int rows = statement.executeUpdate();
+            int x = 5;
+            int y = 2;
             if (rows == 0) {
                 throw new SQLException("Did not work");
             }
